@@ -1,0 +1,7 @@
+white white white black black black space
+white white white black black space black
+white white white black space black black
+white white white space black black black
+white white space white black black black
+white space white white black black black
+space white white white black black black
