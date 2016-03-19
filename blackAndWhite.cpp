@@ -1,19 +1,21 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <algorithm>
 
 using namespace std;
 
 class state
 {
-	vector <string> board;
+public:	
 	//int black;
 	//int white;
 	state* father;
 	int costTotal;
 	int moveCost;
+	int spaceNb;
+	vector <string> board;
 
-public:
 	state()
 	{
 		//this->black = black;
@@ -31,18 +33,8 @@ public:
 		father = NULL;
 		costTotal = 0;
 		moveCost = 0;
+		spaceNb = 6;
 
-	}
-	//answers
-	state(string a, string b, string c, string d, string e, string f, string g)
-	{
-		board.push_back(a);
-		board.push_back(b);
-		board.push_back(c);
-		board.push_back(d);
-		board.push_back(e);
-		board.push_back(f);
-		board.push_back(g);
 	}
 	//generating a new state
 	state(state* father, int costTotal, int moveCost, int move) // move is gonna have int where space is going
@@ -51,12 +43,13 @@ public:
 		this->costTotal = costTotal;
 		this->moveCost = moveCost;
 
-		int i =0;
+		int i = 0;
 		state* temp = father;
-		while(temp->board[i] != "space")
+		while (temp->board[i] != "space")
 		{
 			i++;
 		}
+		spaceNb = move;
 		board = father->board;
 		board[i] = board[move];
 		board[move] = "space";
@@ -64,9 +57,19 @@ public:
 
 };
 
+class sortHelp
+{
+public:
+	bool operator()(const state* a, const state* b)
+	{
+		return a->moveCost < b->moveCost;
+	}
+
+};
+
 class puzzle
 {
-	vector <state*> answers;
+public:
 	vector <state*> solution;
 	vector <state*> openList;
 	vector <state*> closedList;
@@ -74,37 +77,334 @@ class puzzle
 
 	puzzle()
 	{
-		answers.push_back(new state("space","black","black","black","white","white","white"));
-		answers.push_back(new state("black","space","black","black","white","white","white"));
-		answers.push_back(new state("black","black","space","black","white","white","white"));
-		answers.push_back(new state("black","black","black","space","white","white","white"));
-		answers.push_back(new state("black","black","black","white","space","white","white"));
-		answers.push_back(new state("black","black","black","white","white","space","white"));
-		answers.push_back(new state("black","black","black","white","white","white","space"));
 		currentState = NULL;
-
-		state initial();
-		while(checkAnswer())
+		
+		openList.push_back(new state());
+		currentState = openList[0];
+		while (!checkAnswer())
 		{
+			bool flag = false;
+			if (currentState->spaceNb == 6)
+			{
+				state* temp = new state(currentState, currentState->costTotal + 1, 1, 5);
+				temp->costTotal -= euristique(temp);
+				if (checkIfSeenAlready(temp) == false)
+				{
+					openList.push_back(temp);
+					flag = true;
+				}
+				temp = new state(currentState, currentState->costTotal + 1, 1, 4);
+				temp->costTotal -= euristique(temp);
+				if (checkIfSeenAlready(temp) == false)
+				{
+					openList.push_back(temp);
+					flag = true;
+				}
+				temp = new state(currentState, currentState->costTotal + 2, 2, 3);
+				temp->costTotal -= euristique(temp);
+				if (checkIfSeenAlready(temp) == false)
+				{
+					openList.push_back(temp);
+					flag = true;
+				}
+			}
+			else
+			{
+				if (currentState->spaceNb == 5)
+				{
+					state* temp = new state(currentState, currentState->costTotal + 1, 1, 4);
+					temp->costTotal -= euristique(temp);
+					if (checkIfSeenAlready(temp) == false)
+					{
+						openList.push_back(temp);
+						flag = true;
+					}
+					temp = new state(currentState, currentState->costTotal + 1, 1, 3);
+					temp->costTotal -= euristique(temp);
+					if (checkIfSeenAlready(temp) == false)
+					{
+						openList.push_back(temp);
+						flag = true;
+					}
+					temp = new state(currentState, currentState->costTotal + 2, 2, 2);
+					temp->costTotal -= euristique(temp);
+					if (checkIfSeenAlready(temp) == false)
+					{
+						openList.push_back(temp);
+						flag = true;
+					}
+					temp = new state(currentState, currentState->costTotal + 1, 1, 6);
+					temp->costTotal -= euristique(temp);
+				if (checkIfSeenAlready(temp) == false)
+					{
+						openList.push_back(temp);
+						flag = true;
+					}
+				}
+				else
+				{
+					if (currentState->board[4] == "space")
+					{
+						state* temp = new state(currentState, currentState->costTotal + 1, 1, 3);
+						temp->costTotal -= euristique(temp);
+						if (checkIfSeenAlready(temp) == false)
+						{
+							openList.push_back(temp);
+							flag = true;
+						}
+						temp = new state(currentState, currentState->costTotal + 1, 1, 2);
+						temp->costTotal -= euristique(temp);
+						if (checkIfSeenAlready(temp) == false)
+						{
+							openList.push_back(temp);
+							flag = true;
+						}
+						temp = new state(currentState, currentState->costTotal + 2, 2, 1);
+						temp->costTotal -= euristique(temp);
+						if (checkIfSeenAlready(temp) == false)
+						{
+							openList.push_back(temp);
+							flag = true;
+						}
+						temp = new state(currentState, currentState->costTotal + 1, 1, 5);
+						temp->costTotal -= euristique(temp);
+						if (checkIfSeenAlready(temp) == false)
+						{
+							openList.push_back(temp);
+							flag = true;
+						}
+						temp = new state(currentState, currentState->costTotal + 1, 1, 6);
+						temp->costTotal -= euristique(temp);
+						if (checkIfSeenAlready(temp) == false)
+						{
+							openList.push_back(temp);
+							flag = true;
+						}
+					}
+					else
+					{
+						if (currentState->board[3] == "space")
+						{
+							state* temp = new state(currentState, currentState->costTotal + 1, 1, 2);
+							temp->costTotal -= euristique(temp);
+							if (checkIfSeenAlready(temp) == false)
+							{
+								openList.push_back(temp);
+								flag = true;
+							}
+							temp = new state(currentState, currentState->costTotal + 1, 1, 1);
+							temp->costTotal -= euristique(temp);
+							if (checkIfSeenAlready(temp) == false)
+							{
+								openList.push_back(temp);
+								flag = true;
+							}
+							temp = new state(currentState, currentState->costTotal + 2, 2, 0);
+							temp->costTotal -= euristique(temp);
+							if (checkIfSeenAlready(temp) == false)
+							{
+								openList.push_back(temp);
+								flag = true;
+							}
+							temp = new state(currentState, currentState->costTotal + 1, 1, 4);
+							temp->costTotal -= euristique(temp);
+							if (checkIfSeenAlready(temp) == false)
+							{
+								openList.push_back(temp);
+								flag = true;
+							}
+							temp = new state(currentState, currentState->costTotal + 1, 1, 5);
+							temp->costTotal -= euristique(temp);
+							if (checkIfSeenAlready(temp) == false)
+							{
+								openList.push_back(temp);
+								flag = true;
+							}
+							temp = new state(currentState, currentState->costTotal + 2, 2, 6);
+							temp->costTotal -= euristique(temp);
+							if (checkIfSeenAlready(temp) == false)
+							{
+								openList.push_back(temp);
+								flag = true;
+							}
+						}
+						else
+						{
+							if (currentState->spaceNb == 2)
+							{
+								state* temp = new state(currentState, currentState->costTotal + 1, 1, 1);
+								temp->costTotal -= euristique(temp);
+								if (checkIfSeenAlready(temp) == false)
+								{
+									openList.push_back(temp);
+									flag = true;
+								}
+								temp = new state(currentState, currentState->costTotal + 1, 1, 0);
+								temp->costTotal -= euristique(temp);
+								if (checkIfSeenAlready(temp) == false)
+								{
+									openList.push_back(temp);
+									flag = true;
+								}
+								temp = new state(currentState, currentState->costTotal + 1, 1, 3);
+								temp->costTotal -= euristique(temp);
+								if (checkIfSeenAlready(temp) == false)
+								{
+									openList.push_back(temp);
+									flag = true;
+								}
+								temp = new state(currentState, currentState->costTotal + 1, 1, 4);
+								temp->costTotal -= euristique(temp);
+								if (checkIfSeenAlready(temp) == false)
+								{
+									openList.push_back(temp);
+									flag = true;
+								}
+								temp = new state(currentState, currentState->costTotal + 2, 2, 5);
+								temp->costTotal -= euristique(temp);
+								if (checkIfSeenAlready(temp) == false)
+								{
+									openList.push_back(temp);
+									flag = true;
+								}
+							}
+							else
+							{
+								if (currentState->spaceNb == 1)
+								{
+									state* temp = new state(currentState, currentState->costTotal + 1, 1, 0);
+									temp->costTotal -= euristique(temp);
+									if (checkIfSeenAlready(temp) == false)
+									{
+										openList.push_back(temp);
+										flag = true;
+									}
+									temp = new state(currentState, currentState->costTotal + 1, 1, 2);
+									temp->costTotal -= euristique(temp);
+									if (checkIfSeenAlready(temp) == false)
+									{
+										openList.push_back(temp);
+										flag = true;
+									}
+									temp = new state(currentState, currentState->costTotal + 1, 1, 3);
+									temp->costTotal -= euristique(temp);
+									if (checkIfSeenAlready(temp) == false)
+									{
+										openList.push_back(temp);
+										flag = true;
+									}
+									temp = new state(currentState, currentState->costTotal + 2, 2, 4);
+									temp->costTotal -= euristique(temp);
+									if (checkIfSeenAlready(temp) == false)
+									{
+										openList.push_back(temp);
+										flag = true;
+									}
+								}
+								else
+								{
+									if (currentState->spaceNb == 0)
+									{
+										state* temp = new state(currentState, currentState->costTotal + 1, 1, 1);
+										temp->costTotal -= euristique(temp);
+										if (checkIfSeenAlready(temp) == false)
+										{
+											openList.push_back(temp);
+											flag = true;
+										}
+										temp = new state(currentState, currentState->costTotal + 1, 1, 2);
+										temp->costTotal -= euristique(temp);
+										if (checkIfSeenAlready(temp) == false)
+										{
+											openList.push_back(temp);
+											flag = true;
+										}
+										temp = new state(currentState, currentState->costTotal + 2, 2, 3);
+										temp->costTotal -= euristique(temp);
+										if (checkIfSeenAlready(temp) == false)
+										{
+											openList.push_back(temp);
+											flag = true;
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			
+			if (flag == true)
+			{
+				state* temp3 = openList[0];
+				openList.erase(openList.begin());
+				closedList.push_back(temp3);
+				sort(openList.begin(), openList.end(), sortHelp());
+			}	
 
+			currentState = openList[0];
 		}
+
 	}
-	
+
 	bool checkAnswer()
 	{
-		for(int i =0 ; i< 7; i++)
+		int black = 0;
+		int white = 0;
+		for (unsigned int i = 0; i < currentState->board.size(); i++)
 		{
-			if(currentState == answers[i])
+			if (currentState->board[i] =="black")
+			{
+				black++;
+			}
+			else 
+				if (currentState->board[i] == "white")
+				{
+					white++;
+				}
+			if (white > 0 && black < 3)
+				return false;
+			if (white == 0 && black == 3)
 				return true;
 		}
 		return false;
 	}
 
+	bool checkIfSeenAlready(state* ptr)
+	{
+		for (unsigned int i = 0; i < openList.size(); i++)
+		{
+			if (openList[i]->board == ptr->board)
+			{
+				delete ptr;
+				return true;
+			}
+		}
+		for (unsigned int i = 0; i < closedList.size(); i++)
+		{
+			if (closedList[i]->board == ptr->board)
+			{
+				delete ptr;
+				return true;
+			}
+				
+		}
+		return false;
+	}
+	int euristique(state* nextState)
+	{
+		int compteur = 0;
+		int i = 0;
+		while (nextState->board[i] != "white")
+			compteur++;
+		return compteur;
+	}
 };
 
 int main()
 {
-	puzzle sup();
-	
+
+	puzzle a;
+
 	return 0;
 }
